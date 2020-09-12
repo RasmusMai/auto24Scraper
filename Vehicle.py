@@ -84,7 +84,7 @@ class Vehicle:
     def _get_engine_kw(self) -> int:
         engine = self._get_value("Mootor")
         try:
-            return engine.split("(")[1].replace(" kW)", "")
+            return int(engine.split("(")[1].replace(" kW)", ""))
         except IndexError:
             return -1
 
@@ -94,7 +94,7 @@ class Vehicle:
     def _get_odometer(self) -> int:
         raw_odometer = self._get_value("Läbisõidumõõdiku näit")
         try:
-            odometer = raw_odometer.split(" km")[0].replace("\xa0", "")
+            return int(raw_odometer.split(" km")[0].replace("\xa0", ""))
         except (ValueError, IndexError):
             return -1
 
