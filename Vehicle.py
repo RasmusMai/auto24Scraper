@@ -5,9 +5,7 @@ from bs4 import BeautifulSoup
 class AuctionException(Exception):
     pass
 
-
 class Vehicle:
-
     url = "https://www.auto24.ee/used/"
 
     def __init__(self, identifier):
@@ -17,7 +15,7 @@ class Vehicle:
         self.data = self._populate_data()
 
     def _get_listing_page(self, identifier: str):
-        page = requests.get(self.url+str(identifier))
+        page = requests.get(self.url + str(identifier))
         return BeautifulSoup(page.content, "html.parser")
 
     def _populate_data(self) -> dict:
@@ -56,10 +54,11 @@ class Vehicle:
         return init_dict
 
     def _get_value(self, entry: str) -> str:
+        if entry not in self.raw_data.keys():
+            return ""
         if value := self.raw_data[entry]:
             return value
-        else:
-            return ""
+        return ""
 
     def _get_name(self) -> str:
         return self.soup.find("title").text.replace(" - auto24.ee", "")
@@ -84,16 +83,20 @@ class Vehicle:
 
     def _get_engine_kw(self) -> int:
         engine = self._get_value("Mootor")
-        return int(engine.split("(")[1].replace(" kW)", "")) or -1
+        try:
+            return engine.split("(")[1].replace(" kW)", "")
+        except IndexError:
+            return -1
 
     def _get_fuel(self) -> str:
         return self._get_value("Kütus")
 
     def _get_odometer(self) -> int:
         raw_odometer = self._get_value("Läbisõidumõõdiku näit")
-        if raw_odometer:
-            odometer = raw_odometer.replace("\xa0", "").replace(" km", "")
-        return int(odometer) or -1
+        try:
+            odometer = raw_odometer.split(" km")[0].replace("\xa0", "")
+        except (ValueError, IndexError):
+            return -1
 
     def _get_drive(self) -> str:
         return self._get_value("Vedav sild")
@@ -106,7 +109,7 @@ class Vehicle:
 
 
 if __name__ == "__main__":
-    #auctionVehicle = Vehicle("3415526")
+    # auctionVehicle = Vehicle("3415526")
     normalVehicle = Vehicle("3405505")
     print(normalVehicle.data)
 

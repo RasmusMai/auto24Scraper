@@ -20,7 +20,7 @@ def populate_vehicle_data(vehicle):
 
 class Auto24:
     """
-    giga nigga
+    TODO
     """
 
     def __init__(self):
